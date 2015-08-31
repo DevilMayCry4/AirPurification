@@ -19,6 +19,10 @@
 		C3E323981A89A93F0023FF0A /* IoTChangePassword.m in Sources */ = {isa = PBXBuildFile; fileRef = C3E323941A89A93F0023FF0A /* IoTChangePassword.m */; };
 		C3E323991A89A93F0023FF0A /* IoTChangePassword.xib in Resources */ = {isa = PBXBuildFile; fileRef = C3E323951A89A93F0023FF0A /* IoTChangePassword.xib */; };
 		C3EDEFB61AA5B87400972862 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3EDEFB41AA5B84100972862 /* CoreLocation.framework */; };
+		C540FFE11B94871500CCF8A3 /* AirPurificationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FFE01B94871500CCF8A3 /* AirPurificationController.m */; };
+		C540FFE91B9488FF00CCF8A3 /* PredictScrollView.mm in Sources */ = {isa = PBXBuildFile; fileRef = C540FFE61B9488FF00CCF8A3 /* PredictScrollView.mm */; };
+		C540FFEA1B9488FF00CCF8A3 /* StyledPageControl.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FFE81B9488FF00CCF8A3 /* StyledPageControl.m */; };
+		C540FFEE1B94A30800CCF8A3 /* CircleProgressView.mm in Sources */ = {isa = PBXBuildFile; fileRef = C540FFED1B94A30800CCF8A3 /* CircleProgressView.mm */; };
 		D864D6601A36FFC300D05179 /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = D864D65F1A36FFC300D05179 /* data.json */; };
 		E282E6AF1AAE8A0700437088 /* IoTFaultListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E282E6AD1AAE8A0700437088 /* IoTFaultListCell.m */; };
 		E282E6B01AAE8A0700437088 /* IoTFaultListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E282E6AE1AAE8A0700437088 /* IoTFaultListCell.xib */; };
@@ -167,6 +171,14 @@
 		C3E323941A89A93F0023FF0A /* IoTChangePassword.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IoTChangePassword.m; sourceTree = "<group>"; };
 		C3E323951A89A93F0023FF0A /* IoTChangePassword.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IoTChangePassword.xib; sourceTree = "<group>"; };
 		C3EDEFB41AA5B84100972862 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		C540FFDF1B94871500CCF8A3 /* AirPurificationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirPurificationController.h; sourceTree = "<group>"; };
+		C540FFE01B94871500CCF8A3 /* AirPurificationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirPurificationController.m; sourceTree = "<group>"; };
+		C540FFE51B9488FF00CCF8A3 /* PredictScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PredictScrollView.h; sourceTree = "<group>"; };
+		C540FFE61B9488FF00CCF8A3 /* PredictScrollView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PredictScrollView.mm; sourceTree = "<group>"; };
+		C540FFE71B9488FF00CCF8A3 /* StyledPageControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StyledPageControl.h; sourceTree = "<group>"; };
+		C540FFE81B9488FF00CCF8A3 /* StyledPageControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StyledPageControl.m; sourceTree = "<group>"; };
+		C540FFEC1B94A30800CCF8A3 /* CircleProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CircleProgressView.h; sourceTree = "<group>"; };
+		C540FFED1B94A30800CCF8A3 /* CircleProgressView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CircleProgressView.mm; sourceTree = "<group>"; };
 		D864D65F1A36FFC300D05179 /* data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
 		E282E6AC1AAE8A0600437088 /* IoTFaultListCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IoTFaultListCell.h; sourceTree = "<group>"; };
 		E282E6AD1AAE8A0700437088 /* IoTFaultListCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IoTFaultListCell.m; sourceTree = "<group>"; };
@@ -474,6 +486,28 @@
 			path = AccountManager;
 			sourceTree = "<group>";
 		};
+		C540FFE41B9488FF00CCF8A3 /* PredictScrollView */ = {
+			isa = PBXGroup;
+			children = (
+				C540FFE51B9488FF00CCF8A3 /* PredictScrollView.h */,
+				C540FFE61B9488FF00CCF8A3 /* PredictScrollView.mm */,
+				C540FFE71B9488FF00CCF8A3 /* StyledPageControl.h */,
+				C540FFE81B9488FF00CCF8A3 /* StyledPageControl.m */,
+			);
+			name = PredictScrollView;
+			path = Utils/PredictScrollView;
+			sourceTree = SOURCE_ROOT;
+		};
+		C540FFEB1B94A30800CCF8A3 /* CircleProgressView */ = {
+			isa = PBXGroup;
+			children = (
+				C540FFEC1B94A30800CCF8A3 /* CircleProgressView.h */,
+				C540FFED1B94A30800CCF8A3 /* CircleProgressView.mm */,
+			);
+			name = CircleProgressView;
+			path = Utils/CircleProgressView;
+			sourceTree = SOURCE_ROOT;
+		};
 		D8B3C2A21A315E9C00CCC33A /* Main */ = {
 			isa = PBXGroup;
 			children = (
@@ -492,6 +526,8 @@
 				EE2769401A41880100E0E89F /* IoTAlertView.h */,
 				EE2769411A41880200E0E89F /* IoTAlertView.m */,
 				EE2769421A41880200E0E89F /* IoTAlertView.xib */,
+				C540FFDF1B94871500CCF8A3 /* AirPurificationController.h */,
+				C540FFE01B94871500CCF8A3 /* AirPurificationController.m */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -1071,6 +1107,8 @@
 		EEC35B141A1EEC2400B28C03 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				C540FFEB1B94A30800CCF8A3 /* CircleProgressView */,
+				C540FFE41B9488FF00CCF8A3 /* PredictScrollView */,
 				EEB74E861A4438760039E467 /* ZBarSDK */,
 				EE7693FE1A44091500B682DD /* IoTProcessModel */,
 				EE7693561A44019800B682DD /* UICircularSlider */,
@@ -1262,7 +1300,9 @@
 				EE33B4CF1A1C8ED00003854A /* main.m in Sources */,
 				EE27693E1A416C6700E0E89F /* IoTFaultList.m in Sources */,
 				EE7693501A44019400B682DD /* SlideNavigationContorllerAnimatorScaleAndFade.m in Sources */,
+				C540FFEA1B9488FF00CCF8A3 /* StyledPageControl.m in Sources */,
 				EE5C0E4E1A3FC9FA0019CFDD /* IoTHelpDetail.m in Sources */,
+				C540FFE91B9488FF00CCF8A3 /* PredictScrollView.mm in Sources */,
 				C3E3238D1A89A9080023FF0A /* IoTMonitoringStatistics.m in Sources */,
 				C3E323961A89A93F0023FF0A /* IoTAccountManager.m in Sources */,
 				C3E3238B1A89A9080023FF0A /* IoTAdvancedFeatures.m in Sources */,
@@ -1272,6 +1312,8 @@
 				EE2769281A412E7300E0E89F /* IoTTimingSelection.m in Sources */,
 				EE5C0E431A3FC7700019CFDD /* IoTHelp.m in Sources */,
 				C36FFD241A89A35C00DFEBC2 /* IoTRecord.m in Sources */,
+				C540FFEE1B94A30800CCF8A3 /* CircleProgressView.mm in Sources */,
+				C540FFE11B94871500CCF8A3 /* AirPurificationController.m in Sources */,
 				EE5C0EB01A4074A00019CFDD /* IoTShutdownStatus.m in Sources */,
 				EE85B8C21A42895900B2833F /* IoTDeviceDetail.m in Sources */,
 				EE7693551A44019400B682DD /* SlideNavigationController.m in Sources */,
