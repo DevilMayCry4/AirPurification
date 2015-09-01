@@ -27,6 +27,7 @@
 #import "IoTMainController.h"
 #import "IoTFaultList.h"
 #import "IoTAlertView.h"
+#import "AirPurificationController.h"
 #import <QuartzCore/QuartzCore.h>
 
 @interface IoTAdvancedFeatures ()<UIAlertViewDelegate,IoTAlertViewDelegate>
@@ -78,7 +79,11 @@
     [super viewDidLoad];
     
     //设置 IoTMainController 实例
+#if DebugAir
     self.mainCtrl = [IoTMainController currentController];
+#else
+    self.mainCtrl = [AirPurificationController currentController];
+#endif
     if(nil == self.mainCtrl)
     {
         NSLog(@"[IoTMainController currentController] cause error, abort.");

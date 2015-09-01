@@ -95,10 +95,15 @@ NSString * const IOT_PRODUCT       = @"b3a206e380bc4a3c8c157ff4b5491633";
 {
     if(device.isConnected){
         //设备连接后，跳转到控制页面
-//        IoTMainController *mainCtrl = [[IoTMainController alloc] initWithDevice:device];
-//        [self.navCtrl pushViewController:mainCtrl animated:YES];
+ 
+#if DebugAir
+        IoTMainController *mainCtrl = [[IoTMainController alloc] initWithDevice:device];
+         [self.navCtrl pushViewController:mainCtrl animated:YES];
+#else
         AirPurificationController *controller = [[AirPurificationController alloc] initWithDevice:device];
         [self.navCtrl pushViewController:controller animated:YES];
+#endif
+       
     }
 }
 

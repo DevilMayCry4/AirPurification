@@ -17,6 +17,7 @@
 #import "IoTAdvancedFeatures.h"
 #import "BJManegerHttpData.h"
 #import "PredictScrollView.h"
+#import "CircleProgressView.h"
 #import <CoreLocation/CoreLocation.h>
 
 #define ALERT_TAG_SHUTDOWN          1
@@ -51,7 +52,7 @@
     UILabel        *_moistureLabel;
     UIImageView    *_pm25ImageView;
     UIImageView    *_pm10ImageView;
-   
+    CircleProgressView *_filterProgress;
 }
 
 
@@ -124,6 +125,15 @@
         self.edgesForExtendedLayout = UIRectEdgeNone;
     }
     
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_menu"] style:UIBarButtonItemStylePlain target:[SlideNavigationController sharedInstance] action:@selector(toggleLeftMenu)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_start"] style:UIBarButtonItemStylePlain target:self action:@selector(onPower)];
+    
+    [self.Slider setThumbImage:[UIImage imageNamed:@"stripe_poin.png"] forState:(UIControlStateNormal)];
+    [self.Slider setMinimumTrackImage:[UIImage imageNamed:@"stripe_min.png"] forState:(UIControlStateNormal)];
+    [self.Slider setMaximumTrackImage:[UIImage imageNamed:@"stripe_min.png"] forState:(UIControlStateNormal)];
+    self.Slider.userInteractionEnabled = NO;
+    self.airSensitivity = 0;
+
     self.view.backgroundColor = [UIColor whiteColor];
     CGFloat const bottomViewHeight = 58;
     CGRect frame = self.view.bounds;
@@ -248,6 +258,7 @@ static CGFloat const kContentMargin = 15.0;
             _cityLabel.backgroundColor = [UIColor colorWithWhite:1 alpha:0.4];
             _cityLabel.layer.cornerRadius = kStatusHeight/2;
             _cityLabel.clipsToBounds = YES;
+            _cityLabel.font = [UIFont systemFontOfSize:14];
             [contentView addSubview:_cityLabel];
             
             CGFloat const kTemperatureMaring = 10.0;
@@ -304,6 +315,24 @@ static CGFloat const kContentMargin = 15.0;
             lineView.backgroundColor = [UIColor colorWithWhite:1 alpha:0.4];
             [contentView addSubview:lineView];
             
+            CGFloat width = kContentWidth - CGRectGetMaxX(lineView.frame);
+            UILabel *leftLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+            leftLabel.font = _cityLabel.font;
+            leftLabel.text = @"滤芯剩余量";
+            leftLabel.textColor = [UIColor whiteColor];
+            [leftLabel sizeToFit];
+            frame = leftLabel.frame;
+            frame.origin.x = (width - CGRectGetMaxX(frame))/2 + CGRectGetMaxX(lineView.frame);
+            frame.origin.y = CGRectGetMinY(temperatureLabel.frame) - 10;
+            leftLabel.frame = frame;
+            [contentView addSubview:leftLabel];
+            
+            CGFloat const kCircleWidth = 100;
+            _filterProgress = [[CircleProgressView alloc] initWithFrame:CGRectMake((width - kCircleWidth)/2 + CGRectGetMaxX(lineView.frame), CGRectGetMaxY(leftLabel.frame) + 10, kCircleWidth, kCircleWidth)];
+            _filterProgress.progress = 0.6;
+            _filterProgress.progressFont = _temperatureLabel.font;
+            [contentView addSubview:_filterProgress];
+            
         }
             break;
             
@@ -318,27 +347,27 @@ static CGFloat const kContentMargin = 15.0;
 
 
 - (void)initDevice{
-//    //加载页面时，清除旧的故障报警记录
-//    [[IoTRecord sharedInstance] clearAllRecord];
-//    [self onUpdateAlarm];
-//    
-//    bSwitch       = 0;
-//    iWindVelocity = -1;
-//    self.onTiming = 0;
-//    iOffTiming    = 0;
-//    iOnTiming     = 0;
-//    
+    //加载页面时，清除旧的故障报警记录
+    [[IoTRecord sharedInstance] clearAllRecord];
+    [self onUpdateAlarm];
+    
+    bSwitch       = 0;
+    iWindVelocity = -1;
+    self.onTiming = 0;
+    iOffTiming    = 0;
+    iOnTiming     = 0;
+
 //    [self selectSwitchPlasma:bSwitch_Plasma sendToDevice:NO];
 //    [self selectChildSecurityLock:bChild_Security_Lock sendToDevice:NO];
 //    [self selectLEDAirQuality:bLED_Air_Quality sendToDevice:NO];
 //    [self selectWindVelocity:iWindVelocity sendToDevice:NO];
-//    
-//    self.view.userInteractionEnabled = bSwitch;
-//    
-//    //更新关机时间
-//    [self onUpdateShutdownText];
-//    
-//    self.device.delegate = self;
+    
+    self.view.userInteractionEnabled = bSwitch;
+    
+    //更新关机时间
+    [self onUpdateShutdownText];
+    
+    self.device.delegate = self;
 }
 
 - (void)writeDataPoint:(IoTDeviceDataPoint)dataPoint value:(id)value{
@@ -600,39 +629,39 @@ static CGFloat const kContentMargin = 15.0;
     }
     return value;
 }
-//
-//- (void)viewWillAppear:(BOOL)animated
-//{
-//    [super viewWillAppear:animated];
-//    [self initDevice];
-//}
-//
-//- (void)viewDidAppear:(BOOL)animated
-//{
-//    [super viewDidAppear:animated];
-//    
-//    //设备已解除绑定，或者断开连接，退出
-//    if(![self.device isBind:[IoTProcessModel sharedModel].currentUid] || !self.device.isConnected)
-//    {
-//        [self onDisconnected];
-//        return;
-//    }
-//    
-//    //更新侧边菜单数据
-//    [((IoTMainMenu *)[SlideNavigationController sharedInstance].leftMenu).tableView reloadData];
-//    
-//    //在页面加载后，自动更新数据
-//    if(self.device.isOnline)
-//    {
-//        IoTAppDelegate.hud.labelText = @"正在更新数据...";
-//        [IoTAppDelegate.hud showAnimated:YES whileExecutingBlock:^{
-//            sleep(61);
-//        }];
-//        [self writeDataPoint:IoTDeviceWriteUpdateData value:nil];
-//    }
-//    
-//    self.view.userInteractionEnabled = bSwitch;
-//}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self initDevice];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    //设备已解除绑定，或者断开连接，退出
+    if(![self.device isBind:[IoTProcessModel sharedModel].currentUid] || !self.device.isConnected)
+    {
+        [self onDisconnected];
+        return;
+    }
+    
+    //更新侧边菜单数据
+    [((IoTMainMenu *)[SlideNavigationController sharedInstance].leftMenu).tableView reloadData];
+    
+    //在页面加载后，自动更新数据
+    if(self.device.isOnline)
+    {
+        IoTAppDelegate.hud.labelText = @"正在更新数据...";
+        [IoTAppDelegate.hud showAnimated:YES whileExecutingBlock:^{
+            sleep(61);
+        }];
+        [self writeDataPoint:IoTDeviceWriteUpdateData value:nil];
+    }
+    
+    self.view.userInteractionEnabled = bSwitch;
+}
 
 - (void)viewWillDisappear:(BOOL)animated
 {

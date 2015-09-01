@@ -67,6 +67,8 @@
 #define DATA_ATTR_FAULT_AIR_SENSORS     @"Fault_Air_Sensors"    //属性：空气传感器故障
 #define DATA_ATTR_FAULT_DUST_SENSOR     @"Fault_Dust_Sensor"    //属性：灰尘传感器故障
 
+#define DebugAir 0
+
 @protocol PredictScrollViewDelegate;
 
 @interface AirPurificationController : UIViewController<XPGWifiDeviceDelegate,PredictScrollViewDelegate>

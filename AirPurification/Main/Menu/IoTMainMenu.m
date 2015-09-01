@@ -30,7 +30,7 @@
 #import "IoTMainController.h"
 #import "IoTAdvancedFeatures.h"
 #import "IoTMonitoringStatistics.h"
-
+#import "AirPurificationController.h"
 #import "SlideNavigationController.h"
 
 @interface IoTMainMenu () <UITableViewDataSource, UITableViewDelegate, XPGWifiDeviceDelegate>
@@ -93,7 +93,11 @@
 
 - (void)switchToDevice:(XPGWifiDevice *)device
 {
+#if DebugAir
     IoTMainController *mainCtrl = [IoTMainController currentController];
+#else
+    AirPurificationController *mainCtrl = [AirPurificationController currentController];
+#endif
     if(nil == mainCtrl)
     {
         NSLog(@"[IoTMainController currentController] cause error, abort.");
@@ -171,7 +175,11 @@
     if(indexPath.row > 0 && indexPath.row < deviceCount+1)
     {
         //设备
+#if DebugAir
         IoTMainController *mainCtrl = [IoTMainController currentController];
+#else
+        AirPurificationController *mainCtrl = [AirPurificationController currentController];
+#endif
         if(nil == mainCtrl)
         {
             NSLog(@"[IoTMainController currentController] cause error, abort.");
