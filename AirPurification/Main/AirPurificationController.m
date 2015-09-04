@@ -18,9 +18,12 @@
 #import "BJManegerHttpData.h"
 #import "PredictScrollView.h"
 #import "CircleProgressView.h"
-#import <CoreLocation/CoreLocation.h>
+#import <CoreLocation/CoreLocation.h> 
+#import "UICircularSlider.h"
 
 #define ALERT_TAG_SHUTDOWN          1
+
+static NSString *const kAirInfoString = @"我身边的空气指数：";
 
 @interface AirPurificationController ()
 {
@@ -53,6 +56,7 @@
     UIImageView    *_pm25ImageView;
     UIImageView    *_pm10ImageView;
     CircleProgressView *_filterProgress;
+    UICircularSlider *_circleSlider;
 }
 
 
@@ -124,6 +128,8 @@
     {
         self.edgesForExtendedLayout = UIRectEdgeNone;
     }
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"bad_bg"]];
+    [self.view addSubview:imageView];
     
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_menu"] style:UIBarButtonItemStylePlain target:[SlideNavigationController sharedInstance] action:@selector(toggleLeftMenu)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_start"] style:UIBarButtonItemStylePlain target:self action:@selector(onPower)];
@@ -144,7 +150,7 @@
     scrollView.numberOfPages = 3;
     scrollView.currentPage = 1;
     scrollView.showsHorizontalScrollIndicator = NO;
-    scrollView.backgroundColor = [UIColor lightGrayColor];
+    scrollView.backgroundColor = [UIColor clearColor];
     UIView *bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(frame), CGRectGetWidth(frame), bottomViewHeight)];
     bottomView.backgroundColor = [UIColor colorWithRed:0.361  green:0.682  blue:0.910 alpha:1];
     [self.view addSubview:bottomView];
@@ -157,6 +163,18 @@
     UIButton *shareButton = [[UIButton alloc] initWithFrame:CGRectMake(buttonWidth, 0, buttonWidth, bottomViewHeight)];
     [shareButton addTarget:self action:@selector(onShareButtonPress) forControlEvents:UIControlEventTouchUpInside];
     [bottomView addSubview:shareButton];
+    
+    //开启自动定位
+    //判断是否开启了位置服务
+    self.manager = [[CLLocationManager alloc]init];
+    [self.manager requestWhenInUseAuthorization];
+    self.manager.delegate = self;
+    //设置精度
+    [self.manager setDesiredAccuracy:kCLLocationAccuracyBest];
+    //设置更新距离
+    [self.manager setDistanceFilter:20];
+    //开始更新经纬度
+    [self.manager startUpdatingLocation];
     
 }
 
@@ -186,7 +204,7 @@ static CGFloat const kContentMargin = 15.0;
             CGFloat kContentWidth = CGRectGetWidth(frame)-2*kContentMargin;
             UIView *contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, kContentWidth, kContentHeigt)];
             [view addSubview:contentView];
-            contentView.backgroundColor = [UIColor grayColor];
+            contentView.backgroundColor = [UIColor clearColor];
             contentView.center = CGPointMake(CGRectGetWidth(frame)/2, CGRectGetHeight(frame)/2);
             
             CGFloat const kStatusWidth = 172.0;
@@ -196,6 +214,9 @@ static CGFloat const kContentMargin = 15.0;
             _statusLabel.backgroundColor = [UIColor colorWithWhite:1 alpha:0.4];
             _statusLabel.layer.cornerRadius = kStatusHeight/2;
             _statusLabel.clipsToBounds = YES;
+            _statusLabel.textColor = [UIColor whiteColor];
+            _statusLabel.text = kAirInfoString;
+            _statusLabel.font = [UIFont systemFontOfSize:13];
             [contentView addSubview:_statusLabel];
             
             CGFloat const kPMImageWidth = 20.0;
@@ -258,6 +279,7 @@ static CGFloat const kContentMargin = 15.0;
             _cityLabel.backgroundColor = [UIColor colorWithWhite:1 alpha:0.4];
             _cityLabel.layer.cornerRadius = kStatusHeight/2;
             _cityLabel.clipsToBounds = YES;
+            _cityLabel.textColor = [UIColor whiteColor];
             _cityLabel.font = [UIFont systemFontOfSize:14];
             [contentView addSubview:_cityLabel];
             
@@ -336,6 +358,19 @@ static CGFloat const kContentMargin = 15.0;
         }
             break;
             
+        case 2:
+        {
+            _circleSlider = [[UICircularSlider alloc] initWithFrame:CGRectMake(0, 0, 250, 250)];
+            _circleSlider.backgroundColor = [UIColor clearColor];
+            _circleSlider.maximumTrackTintColor = [UIColor colorWithWhite:1 alpha:0.4];
+            _circleSlider.thumbTintColor = [UIColor colorWithRed:0.227  green:0.792  blue:0.976 alpha:1];
+            _circleSlider.minimumTrackTintColor = [UIColor colorWithRed:0.012  green:0.537  blue:0.894 alpha:1];
+            _circleSlider.center = CGPointMake(CGRectGetWidth(view.bounds)/2, CGRectGetHeight(view.bounds)/2);
+            [view addSubview:_circleSlider]; 
+            
+        }
+            break;
+            
         default:
             break;
     }
@@ -368,6 +403,7 @@ static CGFloat const kContentMargin = 15.0;
     [self onUpdateShutdownText];
     
     self.device.delegate = self;
+    
 }
 
 - (void)writeDataPoint:(IoTDeviceDataPoint)dataPoint value:(id)value{
@@ -524,6 +560,22 @@ static CGFloat const kContentMargin = 15.0;
         iAir_Quality                = [self prepareForUpdateFloat:airQuality value:iAir_Quality];
         iAir_Sensitivity            = [self prepareForUpdateFloat:airSensitivity value:iAir_Sensitivity];
         iFilter_Life                = [self prepareForUpdateFloat:filterLife value:iFilter_Life];
+        
+        //TODO::更新界面
+        NSArray *airQualityWords = @[@"优",@"良",@"中",@"差"];
+        _filterProgress.progress = iFilter_Life/100.0;
+        NSString *qualityString = @"";
+        if (iAir_Quality < airQualityWords.count-1)
+        {
+            qualityString = airQualityWords[iAir_Quality];
+        }
+        
+        NSMutableAttributedString *mAttrString = [[NSMutableAttributedString alloc] initWithString:[kAirInfoString stringByAppendingString:qualityString]];
+        NSRange qualityRange = NSMakeRange(mAttrString.length-qualityString.length, qualityString.length);
+        [mAttrString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:0.694  green:0.039  blue:0.078 alpha:1] range:qualityRange];
+        [mAttrString addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:15] range:qualityRange];
+        _statusLabel.attributedText = mAttrString;
+        //end
         
         self.airSensitivity         = iAir_Sensitivity;
         self.filterLife             = iFilter_Life;
@@ -725,7 +777,8 @@ static CGFloat const kContentMargin = 15.0;
 }
 
 #pragma mark - Actions
-- (void)onDisconnected {
+- (void)onDisconnected
+{
     //断线且页面在控制页面时才弹框
     UIViewController *currentController = self.navigationController.viewControllers.lastObject;
     
@@ -1019,6 +1072,21 @@ static CGFloat const kContentMargin = 15.0;
     [BJManegerHttpData requestCityByCLLoacation:newLocation complation:^(id obj) {
         dispatch_async(dispatch_get_main_queue(), ^{
             self.locationLabel.text = (NSString *)obj;
+            if ([obj length])
+            {
+                NSString *string = [obj stringByAppendingString:@"的空气质量"];
+                CGSize size = [string sizeWithFont:_cityLabel.font];
+                CGPoint center = _cityLabel.center;
+                CGRect frame = _cityLabel.frame;
+                frame.size.width = size.width += 40;
+                _cityLabel.frame = frame;
+                _cityLabel.center = center;
+                _cityLabel.text = [obj stringByAppendingString:@"的空气质量"];
+            }
+            else
+            {
+                _cityLabel.text = nil;
+            }
             [self loadingEnvirenInfo];//加载室外空气数据
         });
     }];

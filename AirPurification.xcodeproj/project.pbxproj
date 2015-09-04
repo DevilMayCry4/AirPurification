@@ -19,6 +19,11 @@
 		C3E323981A89A93F0023FF0A /* IoTChangePassword.m in Sources */ = {isa = PBXBuildFile; fileRef = C3E323941A89A93F0023FF0A /* IoTChangePassword.m */; };
 		C3E323991A89A93F0023FF0A /* IoTChangePassword.xib in Resources */ = {isa = PBXBuildFile; fileRef = C3E323951A89A93F0023FF0A /* IoTChangePassword.xib */; };
 		C3EDEFB61AA5B87400972862 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3EDEFB41AA5B84100972862 /* CoreLocation.framework */; };
+		C52FC9F21B981B9C007D983A /* data1.json in Resources */ = {isa = PBXBuildFile; fileRef = C52FC9F11B981B9C007D983A /* data1.json */; };
+		C52FC9F61B992487007D983A /* LoginController.m in Sources */ = {isa = PBXBuildFile; fileRef = C52FC9F41B992487007D983A /* LoginController.m */; };
+		C52FC9F71B992487007D983A /* LoginController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C52FC9F51B992487007D983A /* LoginController.xib */; };
+		C536398F1B9742C1001D0133 /* SAMath.m in Sources */ = {isa = PBXBuildFile; fileRef = C536398C1B9742C1001D0133 /* SAMath.m */; };
+		C53639901B9742C1001D0133 /* SAMultisectorControl.m in Sources */ = {isa = PBXBuildFile; fileRef = C536398E1B9742C1001D0133 /* SAMultisectorControl.m */; };
 		C540FFE11B94871500CCF8A3 /* AirPurificationController.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FFE01B94871500CCF8A3 /* AirPurificationController.m */; };
 		C540FFE91B9488FF00CCF8A3 /* PredictScrollView.mm in Sources */ = {isa = PBXBuildFile; fileRef = C540FFE61B9488FF00CCF8A3 /* PredictScrollView.mm */; };
 		C540FFEA1B9488FF00CCF8A3 /* StyledPageControl.m in Sources */ = {isa = PBXBuildFile; fileRef = C540FFE81B9488FF00CCF8A3 /* StyledPageControl.m */; };
@@ -171,6 +176,14 @@
 		C3E323941A89A93F0023FF0A /* IoTChangePassword.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IoTChangePassword.m; sourceTree = "<group>"; };
 		C3E323951A89A93F0023FF0A /* IoTChangePassword.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IoTChangePassword.xib; sourceTree = "<group>"; };
 		C3EDEFB41AA5B84100972862 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		C52FC9F11B981B9C007D983A /* data1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = data1.json; sourceTree = "<group>"; };
+		C52FC9F31B992487007D983A /* LoginController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginController.h; sourceTree = "<group>"; };
+		C52FC9F41B992487007D983A /* LoginController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginController.m; sourceTree = "<group>"; };
+		C52FC9F51B992487007D983A /* LoginController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoginController.xib; sourceTree = "<group>"; };
+		C536398B1B9742C1001D0133 /* SAMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SAMath.h; sourceTree = "<group>"; };
+		C536398C1B9742C1001D0133 /* SAMath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SAMath.m; sourceTree = "<group>"; };
+		C536398D1B9742C1001D0133 /* SAMultisectorControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SAMultisectorControl.h; sourceTree = "<group>"; };
+		C536398E1B9742C1001D0133 /* SAMultisectorControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SAMultisectorControl.m; sourceTree = "<group>"; };
 		C540FFDF1B94871500CCF8A3 /* AirPurificationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirPurificationController.h; sourceTree = "<group>"; };
 		C540FFE01B94871500CCF8A3 /* AirPurificationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirPurificationController.m; sourceTree = "<group>"; };
 		C540FFE51B9488FF00CCF8A3 /* PredictScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PredictScrollView.h; sourceTree = "<group>"; };
@@ -486,6 +499,18 @@
 			path = AccountManager;
 			sourceTree = "<group>";
 		};
+		C536398A1B9742C1001D0133 /* SAMultisectorControl */ = {
+			isa = PBXGroup;
+			children = (
+				C536398B1B9742C1001D0133 /* SAMath.h */,
+				C536398C1B9742C1001D0133 /* SAMath.m */,
+				C536398D1B9742C1001D0133 /* SAMultisectorControl.h */,
+				C536398E1B9742C1001D0133 /* SAMultisectorControl.m */,
+			);
+			name = SAMultisectorControl;
+			path = Utils/SAMultisectorControl;
+			sourceTree = SOURCE_ROOT;
+		};
 		C540FFE41B9488FF00CCF8A3 /* PredictScrollView */ = {
 			isa = PBXGroup;
 			children = (
@@ -528,6 +553,9 @@
 				EE2769421A41880200E0E89F /* IoTAlertView.xib */,
 				C540FFDF1B94871500CCF8A3 /* AirPurificationController.h */,
 				C540FFE01B94871500CCF8A3 /* AirPurificationController.m */,
+				C52FC9F31B992487007D983A /* LoginController.h */,
+				C52FC9F41B992487007D983A /* LoginController.m */,
+				C52FC9F51B992487007D983A /* LoginController.xib */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -724,6 +752,7 @@
 		EE16C9941A1EF20F0009FB4E /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				C52FC9F11B981B9C007D983A /* data1.json */,
 				E282E6B11AAE8A3000437088 /* Image */,
 				D864D65F1A36FFC300D05179 /* data.json */,
 			);
@@ -1107,6 +1136,7 @@
 		EEC35B141A1EEC2400B28C03 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				C536398A1B9742C1001D0133 /* SAMultisectorControl */,
 				C540FFEB1B94A30800CCF8A3 /* CircleProgressView */,
 				C540FFE41B9488FF00CCF8A3 /* PredictScrollView */,
 				EEB74E861A4438760039E467 /* ZBarSDK */,
@@ -1204,6 +1234,7 @@
 				E282E74D1AAE8A3000437088 /* middle_word@2x.png in Resources */,
 				E282E7141AAE8A3000437088 /* 08_04neng@2x.png in Resources */,
 				E282E7521AAE8A3000437088 /* time_set@2x.png in Resources */,
+				C52FC9F71B992487007D983A /* LoginController.xib in Resources */,
 				E282E70D1AAE8A3000437088 /* stripe_poin@2x.png in Resources */,
 				E282E7191AAE8A3000437088 /* anion_select@2x.png in Resources */,
 				E282E70C1AAE8A3000437088 /* stripe_min@2x.png in Resources */,
@@ -1259,6 +1290,7 @@
 				E282E71A1AAE8A3000437088 /* arrow_1@2x.png in Resources */,
 				E282E7451AAE8A3000437088 /* menu_device@2x.png in Resources */,
 				EEB74EA41A4438760039E467 /* zbar-help.html in Resources */,
+				C52FC9F21B981B9C007D983A /* data1.json in Resources */,
 				EE7694061A44091500B682DD /* IoTProcessModule.bundle in Resources */,
 				E282E7421AAE8A3000437088 /* menu_88-05@2x.png in Resources */,
 				E282E73B1AAE8A3000437088 /* liang_word@2x.png in Resources */,
@@ -1292,6 +1324,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EE85B8B21A42763700B2833F /* IoTMainMenu.m in Sources */,
+				C536398F1B9742C1001D0133 /* SAMath.m in Sources */,
 				EE7693511A44019400B682DD /* SlideNavigationContorllerAnimatorSlide.m in Sources */,
 				EE7693521A44019400B682DD /* SlideNavigationContorllerAnimatorSlideAndFade.m in Sources */,
 				EE7F41D61A3F2B1100F68022 /* IoTDeviceManager.m in Sources */,
@@ -1306,10 +1339,12 @@
 				C3E3238D1A89A9080023FF0A /* IoTMonitoringStatistics.m in Sources */,
 				C3E323961A89A93F0023FF0A /* IoTAccountManager.m in Sources */,
 				C3E3238B1A89A9080023FF0A /* IoTAdvancedFeatures.m in Sources */,
+				C53639901B9742C1001D0133 /* SAMultisectorControl.m in Sources */,
 				EE5C0E5B1A4018C80019CFDD /* IoTMainController.m in Sources */,
 				EE7693591A44019800B682DD /* UICircularSlider.m in Sources */,
 				EE76934E1A44019400B682DD /* SlideNavigationContorllerAnimatorFade.m in Sources */,
 				EE2769281A412E7300E0E89F /* IoTTimingSelection.m in Sources */,
+				C52FC9F61B992487007D983A /* LoginController.m in Sources */,
 				EE5C0E431A3FC7700019CFDD /* IoTHelp.m in Sources */,
 				C36FFD241A89A35C00DFEBC2 /* IoTRecord.m in Sources */,
 				C540FFEE1B94A30800CCF8A3 /* CircleProgressView.mm in Sources */,
@@ -1437,7 +1472,7 @@
 					"\"$(SRCROOT)/Utils/IoTProcessModel/include\"",
 				);
 				INFOPLIST_FILE = AirPurification/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1470,7 +1505,7 @@
 					"\"$(SRCROOT)/Utils/IoTProcessModel/include\"",
 				);
 				INFOPLIST_FILE = AirPurification/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

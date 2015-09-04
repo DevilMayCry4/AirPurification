@@ -29,8 +29,14 @@
 #import "AirPurificationController.h"
 
 // App ID 和 Product Key
-static NSString * const IOT_APPKEY = @"31ee082710384a71bec246e1c9695920";
+
+#if DebugAir
 NSString * const IOT_PRODUCT       = @"b3a206e380bc4a3c8c157ff4b5491633";
+static NSString * const IOT_APPKEY = @"31ee082710384a71bec246e1c9695920";
+#else
+NSString * const IOT_PRODUCT       = @"84ff0f885d5641bbb552840f0bc7ef75";
+static NSString * const IOT_APPKEY = @"8ef82db25175422f8586f08c1c7499ec";
+#endif
 
 @interface AppDelegate ()
 {
@@ -43,7 +49,12 @@ NSString * const IOT_PRODUCT       = @"b3a206e380bc4a3c8c157ff4b5491633";
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     //初始化
-    NSData *data = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"data" ofType:@"json"]];
+#if DebugAir
+    NSString * const file       = @"data";
+#else
+    NSString * const file       = @"data1";
+#endif
+    NSData *data = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:file ofType:@"json"]];
     model = [IoTProcessModel startWithAppID:IOT_APPKEY product:IOT_PRODUCT productJson:data];
     model.delegate = self;
     
@@ -167,12 +178,20 @@ NSString * const IOT_PRODUCT       = @"b3a206e380bc4a3c8c157ff4b5491633";
     {
         if([controller isKindOfClass:[IoTDeviceList class]])
             deviceListCtrl = (IoTDeviceList *)controller;
-        
+#if DebugAir 
         if([controller isKindOfClass:[IoTMainController class]])
         {
             isMainCtrl = YES;
             break;
         }
+#else 
+        if([controller isKindOfClass:[AirPurificationController class]])
+        {
+            isMainCtrl = YES;
+            break;
+        }
+#endif
+        
     }
     
     if(isMainCtrl)

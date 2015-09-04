@@ -5,13 +5,22 @@
 //  Created by Zouhair Mahieddine on 02/03/12.
 //  Copyright (c) 2012 Zouhair Mahieddine.
 //  http://www.zedenem.com
-//  
-//  This file is part of the UICircularSlider Library, released under the MIT License.
 //
-
-#if ! __has_feature(objc_arc)
-#warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
-#endif
+//  This file is part of the UICircularSlider Library.
+//
+//  UICircularProgressView is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  UICircularProgressView is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with UICircularSlider.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 #import <UIKit/UIKit.h>
 
@@ -22,11 +31,11 @@
  * You can set and retrieve the current style of progress view through the progressViewStyle property.
  */
 typedef enum {
-	UICircularSliderStyleCircle,
-	UICircularSliderStylePie,
+    UICircularSliderStyleCircle,
+    UICircularSliderStylePie,
 } UICircularSliderStyle;
 
-@interface UICircularSlider : UIControl <UIGestureRecognizerDelegate>
+@interface UICircularSlider : UIControl
 
 /**
  * The current value of the receiver.
@@ -38,7 +47,7 @@ typedef enum {
 
 /**
  * The minimum value of the receiver.
- * 
+ *
  * If you change the value of this property, and the current value of the receiver is below the new minimum, the current value is adjusted to match the new minimum value automatically.
  * The default value of this property is 0.0.
  */
@@ -46,7 +55,7 @@ typedef enum {
 
 /**
  * The maximum value of the receiver.
- * 
+ *
  * If you change the value of this property, and the current value of the receiver is above the new maximum, the current value is adjusted to match the new maximum value automatically.
  * The default value of this property is 1.0.
  */
@@ -73,6 +82,8 @@ typedef enum {
  * If YES, the slider sends update events continuously to the associated target’s action method.
  * If NO, the slider only sends an action event when the user releases the slider’s thumb control to set the final value.
  * The default value of this property is YES.
+ *
+ * @warning Not implemented Yet.
  */
 @property(nonatomic, getter=isContinuous) BOOL continuous;
 
