@@ -86,7 +86,7 @@
     CGPoint center = CGPointMake(viewSize.width / 2, viewSize.height / 2);
     
     double radius = MIN(viewSize.width, viewSize.height) / 2 - self.thickness;
-    
+    CGContextSetLineCap(ctx, kCGLineCapRound);
     CGContextSetLineWidth(ctx, self.thickness);
     CGContextSetStrokeColorWithColor(ctx,  self.incompletedColor.CGColor);
     CGContextAddArc(ctx, center.x, center.y, radius, 0, DegreeToRadian(360), 0);

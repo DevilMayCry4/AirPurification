@@ -130,12 +130,12 @@
     NSLog(@"--%@--",todayWeather);
 }
 
+static NSString *const kHeweatherProductKey = @"1bade077a60b4845bd06b80a8645f6d2";
+
 + (void)requestAirQualifyInfo:(NSString*)location complation:(CallBack)complation{
-    NSString* urlString = [NSString stringWithFormat:@"http://data.gizwits.com/1/pm25?area=%@",location];
+    NSString* urlString = [NSString stringWithFormat:@"https://api.heweather.com/x3/weather?city=%@&key=%@",location,kHeweatherProductKey];
     NSURL* url = [NSURL URLWithString:[urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:url];
-    [request addValue:@"c79c8ef6002111e48a9b00163e0e2e0d" forHTTPHeaderField:@"X-XPG-Application-Id"];
-    [request addValue:@"c79cd5c8002111e48a9b00163e0e2e0d" forHTTPHeaderField:@"X-XPG-REST-API-Key"];
+    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:url]; 
     
     NSURLSessionDataTask* dataTask = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
@@ -152,10 +152,7 @@
         }
 #endif
         
-        //解析
-        NSDictionary *resultDic = [dic valueForKey:@"result"];
-        NSLog(@"resultDic = %@",resultDic);
-        complation(resultDic);
+        complation([dic[@"HeWeather data service 3.0"] firstObject]);
         
     }];
     [dataTask resume];

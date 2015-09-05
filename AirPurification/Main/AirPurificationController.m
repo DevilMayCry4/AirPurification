@@ -23,6 +23,10 @@
 
 #define ALERT_TAG_SHUTDOWN          1
 
+static CGFloat const kAirVolumeMax = 14.0;
+static CGFloat const kStatusHeight = 25.0;
+static CGFloat const kPM2_5SmallFont = 80.0;
+static CGFloat const kPM2_5BigFont = 112;;
 static NSString *const kAirInfoString = @"我身边的空气指数：";
 
 @interface AirPurificationController ()
@@ -46,8 +50,10 @@ static NSString *const kAirInfoString = @"我身边的空气指数：";
     UILabel        *_cityLabel;
     UILabel        *_temperatureLabel;
     UILabel        *_moistureLabel;
+    UILabel        *_moisturePercentLabel;
     UILabel        *_pm25Label;
     UILabel        *_pm10Label;
+    UILabel        *_airVolumeLabel;
     UIImageView    *_pm25ImageView;
     UIImageView    *_pm10ImageView;
     CircleProgressView *_filterProgress;
@@ -59,7 +65,7 @@ static NSString *const kAirInfoString = @"我身边的空气指数：";
 
 //定位
 @property (nonatomic, strong) CLLocationManager         *manager;
- 
+@property (nonatomic, strong) IoTShutdownStatus         * shutdownStatusCtrl;
 @property (strong, nonatomic) SlideNavigationController *navCtrl;
 
 @end
@@ -91,6 +97,7 @@ static NSString *const kAirInfoString = @"我身边的空气指数：";
         self.edgesForExtendedLayout = UIRectEdgeNone;
     }
     _bgImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"bg1.png"]];
+    _bgImageView.frame = self.view.bounds;
     [self.view addSubview:_bgImageView];
     
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_menu"] style:UIBarButtonItemStylePlain target:[SlideNavigationController sharedInstance] action:@selector(toggleLeftMenu)];
@@ -166,7 +173,7 @@ static CGFloat const kContentMargin = 15.0;
             contentView.center = CGPointMake(CGRectGetWidth(frame)/2, CGRectGetHeight(frame)/2);
             
             CGFloat const kStatusWidth = 172.0;
-            CGFloat const kStatusHeight = 25.0;
+          
             _statusLabel = [[UILabel alloc] initWithFrame:CGRectMake((kContentWidth - kStatusWidth)/2, 0, kStatusWidth, kStatusHeight)];
             _statusLabel.textAlignment = NSTextAlignmentCenter;
             _statusLabel.backgroundColor = [UIColor colorWithWhite:1 alpha:0.4];
@@ -191,7 +198,7 @@ static CGFloat const kContentMargin = 15.0;
             _pmLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(_statusLabel.frame)+22, CGRectGetMinX(_pm25ImageView.frame) - kPadding, 90)];
             _pmLabel.textAlignment = NSTextAlignmentCenter;
             _pmLabel.textColor = [UIColor whiteColor];
-            _pmLabel.font = [self lightFont:112];
+            _pmLabel.font = [self lightFont:80];
            
             [contentView addSubview:_pmLabel];
             
@@ -256,9 +263,9 @@ static CGFloat const kContentMargin = 15.0;
             [contentView addSubview:temperatureLabel];
             
             _temperatureLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(frame) + 20, CGRectGetMinY(frame), 100, CGRectGetHeight(frame))];
-            _temperatureLabel.font  = [UIFont systemFontOfSize:CGRectGetHeight(frame)];
-            _temperatureLabel.textColor = [UIColor whiteColor]; 
+            _temperatureLabel.textColor = [UIColor whiteColor];
             _temperatureLabel.text = @"60";
+            _temperatureLabel.font = [UIFont systemFontOfSize:36];
             [contentView addSubview:_temperatureLabel];
             
             
@@ -273,23 +280,23 @@ static CGFloat const kContentMargin = 15.0;
             moistureLabel.frame = frame;
             [contentView addSubview:moistureLabel];
             
-            _moistureLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(frame) + 20, CGRectGetMinY(frame), 50, CGRectGetHeight(frame))];
-            _moistureLabel.font  = [UIFont systemFontOfSize:CGRectGetHeight(frame)];
+            _moistureLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(frame) + 20, CGRectGetMinY(frame), 50, CGRectGetHeight(frame))]; 
             _moistureLabel.textColor = [UIColor whiteColor];
             _moistureLabel.textAlignment = NSTextAlignmentRight;
             _moistureLabel.text = @"60";
+            _moistureLabel.font = [UIFont systemFontOfSize:36];
             [contentView addSubview:_moistureLabel];
             
-            UILabel *precentLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-            precentLabel.text = @"%";
-            precentLabel.textColor = [UIColor whiteColor];
-            precentLabel.font = [UIFont systemFontOfSize:18];
-            [precentLabel sizeToFit];
-            frame = precentLabel.frame;
+            _moisturePercentLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+            _moisturePercentLabel.text = @"%";
+            _moisturePercentLabel.textColor = [UIColor whiteColor];
+            _moisturePercentLabel.font = [UIFont systemFontOfSize:18];
+            [_moisturePercentLabel sizeToFit];
+            frame = _moisturePercentLabel.frame;
             frame.origin.x = CGRectGetMaxX(_moistureLabel.frame);
             frame.origin.y = CGRectGetMinY(_moistureLabel.frame) - CGRectGetHeight(frame)/2 + 8;
-            precentLabel.frame = frame;
-            [contentView addSubview:precentLabel];
+            _moisturePercentLabel.frame = frame;
+            [contentView addSubview:_moisturePercentLabel];
             
             CGFloat const kLineWidth = 2.0;
             UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake((kContentWidth - kLineWidth)/2, CGRectGetMaxY(_cityLabel.frame) + 20, kLineWidth, 122)];
@@ -324,8 +331,17 @@ static CGFloat const kContentMargin = 15.0;
             _circleSlider.maximumTrackTintColor = [UIColor colorWithWhite:1 alpha:0.4];
             _circleSlider.thumbTintColor = [UIColor colorWithRed:0.227  green:0.792  blue:0.976 alpha:1];
             _circleSlider.minimumTrackTintColor = [UIColor colorWithRed:0.012  green:0.537  blue:0.894 alpha:1];
+            _circleSlider.continuous = NO;
+            _circleSlider.maximumValue = kAirVolumeMax;
+            [_circleSlider addTarget:self action:@selector(airVolumeChange:) forControlEvents:UIControlEventValueChanged];
             _circleSlider.center = CGPointMake(CGRectGetWidth(view.bounds)/2, CGRectGetHeight(view.bounds)/2);
-            [view addSubview:_circleSlider]; 
+            [view addSubview:_circleSlider];
+            CGFloat height  = 90.0;
+            _airVolumeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, (CGRectGetHeight(_circleSlider.frame) - height)/2, CGRectGetWidth(_circleSlider.frame), height)];
+            _airVolumeLabel.font = [UIFont systemFontOfSize:84];
+            _airVolumeLabel.textColor = [UIColor whiteColor];
+            _airVolumeLabel.textAlignment = NSTextAlignmentCenter;
+            [_circleSlider addSubview:_airVolumeLabel];
             
         }
             break;
@@ -488,10 +504,10 @@ static CGFloat const kContentMargin = 15.0;
 }
 
 //数据入口
-- (BOOL)XPGWifiDevice:(XPGWifiDevice *)device didReceiveData:(NSDictionary *)data result:(int)result{
+- (void)XPGWifiDevice:(XPGWifiDevice *)device didReceiveData:(NSDictionary *)data result:(int)result{
     
     if(![device.did isEqualToString:self.device.did])
-        return YES;
+        return;
     
     [IoTAppDelegate.hud hide:YES];
     //[self.shutdownStatusCtrl hide:YES];
@@ -505,10 +521,11 @@ static CGFloat const kContentMargin = 15.0;
         NSString *AQI  = [self readDataPoint:IoTDeviceAlertAirQuality data:_data];
         iFilter_Life = [[self readDataPoint:IoTDeviceAlertFilterLife data:_data] integerValue];
         Air_Volume = [[self readDataPoint:IoTDeviceWriteWindVelocity  data:_data] integerValue];
-        _pm25Label.text = [self readDataPoint:IoTDeviceWritPM2_5 data:_data];
+       
          self.view.userInteractionEnabled = bSwitch;
-        _temperatureLabel.text = [self readDataPoint:IoTDevice_temperature data:_data];
         
+        NSInteger airVolume = [[self readDataPoint:IoTDeviceWriteWindVelocity data:_data] integerValue];
+        _circleSlider.value = airVolume;
         NSInteger maxAir = 254;
         NSArray *airQualityWords = @[@"健康",@"亚健康",@"不健康"];
         NSString *qualityString = @"";
@@ -542,15 +559,45 @@ static CGFloat const kContentMargin = 15.0;
         [mAttrString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:0.694  green:0.039  blue:0.078 alpha:1] range:qualityRange];
         [mAttrString addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:15] range:qualityRange];
         _statusLabel.attributedText = mAttrString;
- 
         
+        CGPoint center = _statusLabel.center;
+        [_statusLabel sizeToFit];
+        CGRect frame = _statusLabel.frame;
+        frame.size.width += 40;
+        frame.size.height = kStatusHeight;
+        _statusLabel.frame = frame;
+        _statusLabel.center = center;
+  
+//        机器pm2.5
+        _pmLabel.text = [self readDataPoint:IoTDeviceWritPM2_5 data:_data];
+        _pmLabel.font = [self lightFont:_pmLabel.text.length < 3 ? kPM2_5BigFont : kPM2_5SmallFont];
+        center = _pmLabel.center;
+        [_pmLabel sizeToFit];
+        frame = _pmLabel.frame;
+        _pmLabel.frame = frame;
+        _pmLabel.center = center;
+        
+//    温度
+        _temperatureLabel.text = [self readDataPoint:IoTDevice_temperature data:_data];
  
+//     湿度
+        CGPoint origin = _moistureLabel.frame.origin;
+        _moistureLabel.text = [self readDataPoint:IoTDevicehumidity data:_data];
+        [_moistureLabel sizeToFit];
+        frame = _moistureLabel.frame;
+        frame.origin = origin;
+        _moistureLabel.frame = frame;
+       
+        
+        frame = _moisturePercentLabel.frame;
+        frame.origin.x = CGRectGetMaxX(_moistureLabel.frame);
+        _moisturePercentLabel.frame = frame;
         
         //没有开机，切换页面
         if(!bSwitch)
         {
             [self onPower];
-            return YES;
+            return;
         }
     }
     
@@ -559,22 +606,14 @@ static CGFloat const kContentMargin = 15.0;
      * 报警和错误
      */
     if([self.navigationController.viewControllers lastObject] != self)
-        return YES;
+        return ;
        /**
      * 清理旧报警及故障
      */
     [[IoTRecord sharedInstance] clearAllRecord];
     
-    
-    /**
-     * 添加当前故障
-     */
-    NSDate *date = [NSDate date];
-    
-    
-    [self onUpdateAlarm];
-    
-    return YES;
+ 
+ 
 }
 
 - (CGFloat)prepareForUpdateFloat:(NSString *)str value:(CGFloat)value
@@ -690,10 +729,19 @@ static CGFloat const kContentMargin = 15.0;
     }
     else
     {
+        //开机
+        self.shutdownStatusCtrl = [[IoTShutdownStatus alloc]init];
+        self.shutdownStatusCtrl.mainCtrl = self;
+        [self.shutdownStatusCtrl show:YES];
     }
 }
 
 #pragma mark - Actions
+- (void)airVolumeChange:(UICircularSlider *)slider
+{
+    _airVolumeLabel.text = [@((int)(slider.value + 0.5)) stringValue];
+}
+
 - (void)onDisconnected
 {
     //断线且页面在控制页面时才弹框
@@ -870,40 +918,12 @@ static CGFloat const kContentMargin = 15.0;
     [BJManegerHttpData requestAirQualifyInfo:_location complation:^(id obj) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSDictionary *resultDic = (NSDictionary *)obj;
-            
-            //pm2.5
-            double pm25 = [[resultDic valueForKey:@"pm2_5"] doubleValue];
-            NSLog(@"pm2.5 --- %f",pm25);
-            
-            //空气质量
-            double aqi = [[resultDic valueForKey:@"aqi"] doubleValue];
-            NSString *airQualify;
-            
-            //0-50=优, 50-100=良, 100-150=轻度污染, 150-200=中度污染,200-300=重度污染, 300以上=严重污染
-            if (aqi >= 0 && aqi <=50)
-                airQualify = @"优";
-            else if (aqi > 50 && aqi <= 100)
-                airQualify = @"良好";
-            else if (aqi > 100 && aqi <= 150)
-                airQualify = @"轻度污染";
-            else if (aqi > 150 && aqi <= 200)
-                airQualify = @"中度污染";
-            else if (aqi > 200 && aqi <= 300)
-                airQualify = @"重度污染";
-            else if (aqi > 300)
-                airQualify = @"严重污染";
-            else
-                airQualify = @"-";
-            
-            NSLog(@"airQua --- %@",airQualify);
-            NSLog(@"PM2.5/PM10: --- %@",resultDic);
-            
-            //pm10
-            double pm10 = [[resultDic valueForKey:@"pm10"] doubleValue];
-            
-           
-            _pm25Label.text = [NSString stringWithFormat:@"%.0f",pm25];
-            _pm10Label.text = [NSString stringWithFormat:@"%.0f",pm10];
+            NSDictionary *city = resultDic[@"aqi"][@"city"];
+            if (city)
+            {
+                _pm25Label.text = city[@"pm25"];
+                _pm10Label.text = city[@"pm10"];
+            }
         });
     }];
 }
