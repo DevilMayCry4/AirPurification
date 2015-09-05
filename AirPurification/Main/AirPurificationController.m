@@ -52,6 +52,7 @@ static NSString *const kAirInfoString = @"我身边的空气指数：";
     UIImageView    *_pm10ImageView;
     CircleProgressView *_filterProgress;
     UICircularSlider *_circleSlider;
+    UIImageView     *_bgImageView;
 }
 
 
@@ -84,12 +85,13 @@ static NSString *const kAirInfoString = @"我身边的空气指数：";
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
     if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)])
     {
         self.edgesForExtendedLayout = UIRectEdgeNone;
     }
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"bad_bg"]];
-    [self.view addSubview:imageView];
+    _bgImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"bg1.png"]];
+    [self.view addSubview:_bgImageView];
     
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_menu"] style:UIBarButtonItemStylePlain target:[SlideNavigationController sharedInstance] action:@selector(toggleLeftMenu)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_start"] style:UIBarButtonItemStylePlain target:self action:@selector(onPower)];
@@ -206,8 +208,9 @@ static CGFloat const kContentMargin = 15.0;
             pm25Label.frame = frame;
             [contentView addSubview:pm25Label];
             
-            _pm25Label = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(frame), CGRectGetMaxY(frame) + 8, CGRectGetWidth(frame), 20)];
+            _pm25Label = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(frame), CGRectGetMaxY(frame) + 4, CGRectGetWidth(frame), 20)];
             _pm25Label.textColor = [UIColor whiteColor];
+            _pm25Label.font = [UIFont boldSystemFontOfSize:20];
             _pm25Label.textAlignment = NSTextAlignmentCenter;
             _pm25Label.adjustsFontSizeToFitWidth = YES;
             [contentView addSubview:_pm25Label];
@@ -223,8 +226,9 @@ static CGFloat const kContentMargin = 15.0;
             pm10Label.frame = frame;
             [contentView addSubview:pm10Label];
             
-            _pm10Label = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(frame), CGRectGetMaxY(frame) + 8, CGRectGetWidth(frame), 20)];
+            _pm10Label = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(frame), CGRectGetMaxY(frame) + 4, CGRectGetWidth(frame), 20)];
             _pm10Label.textColor = [UIColor whiteColor];
+            _pm10Label.font = _pm25Label.font;
             _pm10Label.textAlignment = NSTextAlignmentCenter;
             _pm10Label.adjustsFontSizeToFitWidth = YES;
             [contentView addSubview:_pm10Label];
@@ -251,10 +255,9 @@ static CGFloat const kContentMargin = 15.0;
             temperatureLabel.frame = frame;
             [contentView addSubview:temperatureLabel];
             
-            _temperatureLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(frame) + 20, CGRectGetMinY(frame), 50, CGRectGetHeight(frame))];
+            _temperatureLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(frame) + 20, CGRectGetMinY(frame), 100, CGRectGetHeight(frame))];
             _temperatureLabel.font  = [UIFont systemFontOfSize:CGRectGetHeight(frame)];
-            _temperatureLabel.textColor = [UIColor whiteColor];
-            _temperatureLabel.textAlignment = NSTextAlignmentRight;
+            _temperatureLabel.textColor = [UIColor whiteColor]; 
             _temperatureLabel.text = @"60";
             [contentView addSubview:_temperatureLabel];
             
@@ -448,6 +451,10 @@ static CGFloat const kContentMargin = 15.0;
         case IoTDeviceWriteOnOff:
             return [attributes valueForKey:Data_Switch];
             
+        case IoTDeviceAlertAirQuality:
+            return attributes[Data_AQI];
+            break;
+            
         case IoTDeviceAlertFilterLife:
             return attributes[Data_Cartridge_life];
             break;
@@ -500,11 +507,13 @@ static CGFloat const kContentMargin = 15.0;
         Air_Volume = [[self readDataPoint:IoTDeviceWriteWindVelocity  data:_data] integerValue];
         _pm25Label.text = [self readDataPoint:IoTDeviceWritPM2_5 data:_data];
          self.view.userInteractionEnabled = bSwitch;
+        _temperatureLabel.text = [self readDataPoint:IoTDevice_temperature data:_data];
         
         NSInteger maxAir = 254;
         NSArray *airQualityWords = @[@"健康",@"亚健康",@"不健康"];
         NSString *qualityString = @"";
         NSInteger iAir_Quality = AQI.integerValue;
+        
         if (iAir_Quality <= maxAir/airQualityWords.count)
         {
             qualityString = [airQualityWords firstObject];
@@ -517,6 +526,8 @@ static CGFloat const kContentMargin = 15.0;
         {
             qualityString = [airQualityWords lastObject];
         }
+        NSString *bgName = [NSString stringWithFormat:@"bg%lu",[airQualityWords indexOfObject:qualityString]+1];
+        _bgImageView.image = [UIImage imageNamed:bgName];
         //TODO::更新界面
         
         _filterProgress.progress = iFilter_Life/100.0;

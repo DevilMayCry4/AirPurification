@@ -52,6 +52,7 @@
 #define Data_humidity @"humidity"
 #define Data_model @"model"
 #define Data_temperature @"temperature"
+#define Data_AQI @"AQI"
 
 
 #define DebugAir  0
