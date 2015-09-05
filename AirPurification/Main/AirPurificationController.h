@@ -45,29 +45,16 @@
 //}IoTDeviceCommand;
 
 #define DATA_CMD                        @"cmd"                  //命令
-#define DATA_ENTITY                     @"entity0"              //实体
-#define DATA_ATTR_SWITCH                @"Switch"               //属性：开关
-#define DATA_ATTR_SWITCH_PLASMA         @"Switch_Plasma"        //属性：等离子开关
-#define DATA_ATTR_LED_AIR_QUALITY       @"LED_Air_Quality"      //属性：空气质量指示灯
-#define DATA_ATTR_CHILD_SECURITY_LOCK   @"Child_Security_Lock"  //属性：儿童安全锁
-#define DATA_ATTR_WIND_VELOCITY         @"Wind_Velocity"        //属性：风速
-#define DATA_ATTR_AIR_SENSITIVITY       @"Air_Sensitivity"      //属性：空气检测灵敏度
-#define DATA_ATTR_FILTER_LIFE           @"Filter_Life"          //属性：滤网寿命
-#define DATA_ATTR_WEEK_REPEAT           @"Week_Repeat"          //属性：按周重复
-#define DATA_ATTR_COUNTDOWN_ON_MIN      @"CountDown_On_min"     //属性：倒计时开机
-#define DATA_ATTR_COUNTDOWN_OFF_MIN     @"CountDown_Off_min"    //属性：倒计时关机
-#define DATA_ATTR_TIMING_ON             @"Timing_On"            //属性：定时开机
-#define DATA_ATTR_TIMING_OFF            @"Timing_Off"           //属性：定时关机
-#define DATA_ATTR_AIR_QUALITY           @"Air_Quality"          //属性：空气质量
-#define DATA_ATTR_DUST_AIR_QUALITY      @"Dust_Air_Quality"     //属性：空气质量_粉尘
-#define DATA_ATTR_PECULIAR_AIR_QUALITY  @"Peculiar_Air_Quality" //属性：空气质量_异味
-#define DATA_ATTR_ALERT_FILTER_LIFE     @"Alert_Filter_Life"    //属性：滤芯寿命报警
-#define DATA_ATTR_ALERT_AIR_QUALITY     @"Alert_Air_Quality"    //属性：空气质量警报
-#define DATA_ATTR_FAULT_MOTOR           @"Fault_Motor"          //属性：电机故障
-#define DATA_ATTR_FAULT_AIR_SENSORS     @"Fault_Air_Sensors"    //属性：空气传感器故障
-#define DATA_ATTR_FAULT_DUST_SENSOR     @"Fault_Dust_Sensor"    //属性：灰尘传感器故障
+#define Data_Switch @"ON_OFF"
+#define Data_Air_Volume @"Air_Volume"
+#define Data_Cartridge_life @"Cartridge_life"
+#define Data_PM2_5   @"PM2_5"
+#define Data_humidity @"humidity"
+#define Data_model @"model"
+#define Data_temperature @"temperature"
 
-#define DebugAir 0
+
+#define DebugAir  0
 
 @protocol PredictScrollViewDelegate;
 

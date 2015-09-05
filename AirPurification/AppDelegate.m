@@ -55,9 +55,10 @@ static NSString * const IOT_APPKEY = @"8ef82db25175422f8586f08c1c7499ec";
     NSString * const file       = @"data1";
 #endif
     NSData *data = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:file ofType:@"json"]];
+   
     model = [IoTProcessModel startWithAppID:IOT_APPKEY product:IOT_PRODUCT productJson:data];
-    model.delegate = self;
-    
+    model.delegate = self; 
+    [XPGWifiSDK updateDeviceFromServer:IOT_PRODUCT];
     //用户未注册-->登录
     //用户已注册-->设备列表
     if(nil == self.window)
@@ -74,7 +75,7 @@ static NSString * const IOT_APPKEY = @"8ef82db25175422f8586f08c1c7499ec";
     self.navCtrl.leftMenu = [[IoTMainMenu alloc] init];//主菜单部分
     self.navCtrl.navigationBar.tintColor = [UIColor whiteColor];
     self.navCtrl.navigationBar.barTintColor = [UIColor colorWithRed:0.1484375 green:0.49609375 blue:0.90234375 alpha:1.00];//导航颜色
-    
+   [XPGWifiSDK setLogLevel:XPGWifiLogLevelAll logFile:nil printDataLevel:NO];
     model.tintColor = self.navCtrl.navigationBar.tintColor;
     model.barTintColor = self.navCtrl.navigationBar.barTintColor;
     
@@ -85,6 +86,7 @@ static NSString * const IOT_APPKEY = @"8ef82db25175422f8586f08c1c7499ec";
     
     return YES;
 }
+
 
 #pragma mark - call tel 10086
 - (void)callServices

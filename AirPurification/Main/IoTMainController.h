@@ -50,6 +50,10 @@ typedef enum
     IoTDeviceFaultAir,                      //空气传感器故障
     IoTDeviceFaultDust,                     //灰尘传感器故障
     
+    IoTDeviceWritPM2_5, // PM2_5
+    IoTDevicehumidity, //humidity
+    IoTDevice_model ,// 模式分智能、手动、睡眠三种模式
+    IoTDevice_temperature,//temperature
 }IoTDeviceDataPoint;
 
 typedef enum

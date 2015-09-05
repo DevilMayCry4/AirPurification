@@ -35,24 +35,19 @@ static NSString *const kAirInfoString = @"我身边的空气指数：";
     BOOL bSwitch_Plasma;
     BOOL bLED_Air_Quality;
     BOOL bChild_Security_Lock;
-    NSInteger iOnTiming;
-    NSInteger iOffTiming;
-    NSInteger iWindVelocity;
-    NSInteger iAir_Sensitivity;
     NSInteger iFilter_Life;
-    NSInteger iAir_Quality;
-    
+    NSInteger Air_Volume;
     //临时数据
     NSArray *modeImages, *modeTexts;
     
-    //时间选择
-    IoTTimingSelection *_timingSelection;
-    
+    NSString *_location;
     UILabel        *_statusLabel;
     UILabel        *_pmLabel;
     UILabel        *_cityLabel;
     UILabel        *_temperatureLabel;
     UILabel        *_moistureLabel;
+    UILabel        *_pm25Label;
+    UILabel        *_pm10Label;
     UIImageView    *_pm25ImageView;
     UIImageView    *_pm10ImageView;
     CircleProgressView *_filterProgress;
@@ -60,46 +55,10 @@ static NSString *const kAirInfoString = @"我身边的空气指数：";
 }
 
 
-@property (weak, nonatomic  ) IBOutlet UIView                    *globalView;
-
-//室内空气质量情况
-@property (weak, nonatomic  ) IBOutlet UIImageView               *imageStatus;
-@property (weak, nonatomic  ) IBOutlet UIImageView               *imageStatusColor;
-
-//模式
-@property (weak, nonatomic  ) IBOutlet UIButton                  *btnSleep;
-@property (weak, nonatomic  ) IBOutlet UIButton                  *btnStandard;
-@property (weak, nonatomic  ) IBOutlet UIButton                  *btnStrong;
-@property (weak, nonatomic  ) IBOutlet UIButton                  *btnAuto;
-
-@property (weak, nonatomic  ) IBOutlet UISlider                  *Slider;
-
-//定时关机
-@property (weak, nonatomic  ) IBOutlet UILabel                   *textShutdown;
-@property (weak, nonatomic  ) IBOutlet UIButton                  *btnShutdown;
-
-@property (weak, nonatomic  ) IBOutlet UIButton                  *btnSwitchPlasma;
-@property (weak, nonatomic  ) IBOutlet UILabel                   *textSwitchPlasma;
-@property (weak, nonatomic  ) IBOutlet UIImageView               *imageSwitchPlasma;
-@property (weak, nonatomic  ) IBOutlet UIButton                  *btnChildSecurityLock;
-@property (weak, nonatomic  ) IBOutlet UILabel                   *textChildSecurityLock;
-@property (weak, nonatomic  ) IBOutlet UIImageView               *imageChildSecurityLock;
-@property (weak, nonatomic  ) IBOutlet UIButton                  *btnLEDAirQuality;
-@property (weak, nonatomic  ) IBOutlet UILabel                   *textLEDAirQuality;
-@property (weak, nonatomic  ) IBOutlet UIImageView               *imageLEDAirQuality;
-
-@property (weak, nonatomic  ) IBOutlet UILabel                   *airQualityLabel;
-@property (weak, nonatomic  ) IBOutlet UILabel                   *pm25Label;
-@property (weak, nonatomic  ) IBOutlet UILabel                   *pm10Label;
-
-@property (nonatomic, strong) IoTShutdownStatus         * shutdownStatusCtrl;
 
 //定位
 @property (nonatomic, strong) CLLocationManager         *manager;
-@property (nonatomic, strong) UILabel                   * locationLabel;
-
-@property (nonatomic, strong) NSArray                   * alerts;
-@property (nonatomic, strong) NSArray                   * faults;
+ 
 @property (strong, nonatomic) SlideNavigationController *navCtrl;
 
 @end
@@ -117,6 +76,7 @@ static NSString *const kAirInfoString = @"我身边的空气指数：";
             return nil;
         }
         self.device = device;
+        
     }
     return self;
 }
@@ -133,11 +93,7 @@ static NSString *const kAirInfoString = @"我身边的空气指数：";
     
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_menu"] style:UIBarButtonItemStylePlain target:[SlideNavigationController sharedInstance] action:@selector(toggleLeftMenu)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_start"] style:UIBarButtonItemStylePlain target:self action:@selector(onPower)];
-    
-    [self.Slider setThumbImage:[UIImage imageNamed:@"stripe_poin.png"] forState:(UIControlStateNormal)];
-    [self.Slider setMinimumTrackImage:[UIImage imageNamed:@"stripe_min.png"] forState:(UIControlStateNormal)];
-    [self.Slider setMaximumTrackImage:[UIImage imageNamed:@"stripe_min.png"] forState:(UIControlStateNormal)];
-    self.Slider.userInteractionEnabled = NO;
+  
     self.airSensitivity = 0;
 
     self.view.backgroundColor = [UIColor whiteColor];
@@ -250,7 +206,7 @@ static CGFloat const kContentMargin = 15.0;
             pm25Label.frame = frame;
             [contentView addSubview:pm25Label];
             
-            _pm25Label = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(frame), CGRectGetMaxY(frame) + 8, CGRectGetWidth(frame), 20)];
+            _pm25Label = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(frame), CGRectGetMaxY(frame) + 8, CGRectGetWidth(frame), 20)];
             _pm25Label.textColor = [UIColor whiteColor];
             _pm25Label.textAlignment = NSTextAlignmentCenter;
             _pm25Label.adjustsFontSizeToFitWidth = YES;
@@ -267,7 +223,7 @@ static CGFloat const kContentMargin = 15.0;
             pm10Label.frame = frame;
             [contentView addSubview:pm10Label];
             
-            _pm10Label = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(frame), CGRectGetMaxY(frame) + 8, CGRectGetWidth(frame), 20)];
+            _pm10Label = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(frame), CGRectGetMaxY(frame) + 8, CGRectGetWidth(frame), 20)];
             _pm10Label.textColor = [UIColor whiteColor];
             _pm10Label.textAlignment = NSTextAlignmentCenter;
             _pm10Label.adjustsFontSizeToFitWidth = YES;
@@ -387,10 +343,8 @@ static CGFloat const kContentMargin = 15.0;
     [self onUpdateAlarm];
     
     bSwitch       = 0;
-    iWindVelocity = -1;
     self.onTiming = 0;
-    iOffTiming    = 0;
-    iOnTiming     = 0;
+ 
 
 //    [self selectSwitchPlasma:bSwitch_Plasma sendToDevice:NO];
 //    [self selectChildSecurityLock:bChild_Security_Lock sendToDevice:NO];
@@ -398,9 +352,7 @@ static CGFloat const kContentMargin = 15.0;
 //    [self selectWindVelocity:iWindVelocity sendToDevice:NO];
     
     self.view.userInteractionEnabled = bSwitch;
-    
-    //更新关机时间
-    [self onUpdateShutdownText];
+   
     
     self.device.delegate = self;
     
@@ -417,7 +369,7 @@ static CGFloat const kContentMargin = 15.0;
             break;
         case IoTDeviceWriteOnOff:
             data = @{DATA_CMD: @(IoTDeviceCommandWrite),
-                     DATA_ENTITY: @{DATA_ATTR_SWITCH: value}};
+                     DATA_ENTITY: @{Data_Switch: value}};
             break;
         case IoTDeviceWriteCountDownOnMin:
             data = @{DATA_CMD: @(IoTDeviceCommandWrite),
@@ -435,10 +387,7 @@ static CGFloat const kContentMargin = 15.0;
             data = @{DATA_CMD: @(IoTDeviceCommandWrite),
                      DATA_ENTITY: @{DATA_ATTR_LED_AIR_QUALITY: value}};
             break;
-        case IoTDeviceWriteSwitchPlasma:
-            data = @{DATA_CMD:@(IoTDeviceCommandWrite),
-                     DATA_ENTITY: @{DATA_ATTR_SWITCH_PLASMA: value}};
-            break;
+     
         case IoTDeviceWriteWindVelocity:
             data = @{DATA_CMD: @(IoTDeviceCommandWrite),
                      DATA_ENTITY: @{DATA_ATTR_WIND_VELOCITY: value}};
@@ -497,25 +446,31 @@ static CGFloat const kContentMargin = 15.0;
     switch (dataPoint)
     {
         case IoTDeviceWriteOnOff:
-            return [attributes valueForKey:DATA_ATTR_SWITCH];
-        case IoTDeviceWriteCountDownOnMin:
-            return [attributes valueForKey:DATA_ATTR_COUNTDOWN_ON_MIN];
-        case IoTDeviceWriteCountDownOffMin:
-            return [attributes valueForKey:DATA_ATTR_COUNTDOWN_OFF_MIN];
-        case IoTDeviceWriteSwitchPlasma:
-            return [attributes valueForKey:DATA_ATTR_SWITCH_PLASMA];
-        case IoTDeviceWriteChildSecurityLock:
-            return [attributes valueForKey:DATA_ATTR_CHILD_SECURITY_LOCK];
-        case IoTDeviceWriteLEDAirQuality:
-            return [attributes valueForKey:DATA_ATTR_LED_AIR_QUALITY];
+            return [attributes valueForKey:Data_Switch];
+            
+        case IoTDeviceAlertFilterLife:
+            return attributes[Data_Cartridge_life];
+            break;
+            
         case IoTDeviceWriteWindVelocity:
-            return [attributes valueForKey:DATA_ATTR_WIND_VELOCITY];
-        case IoTDeviceWriteQuality:
-            return [attributes valueForKey:DATA_ATTR_AIR_QUALITY];
-        case IoTDeviceWriteAirSensitivity:
-            return [attributes valueForKey:DATA_ATTR_AIR_SENSITIVITY];
-        case IoTDeviceWriteFilterLife:
-            return [attributes valueForKey:DATA_ATTR_FILTER_LIFE];
+            return attributes[Data_Air_Volume];
+            break;
+            
+        case IoTDeviceWritPM2_5:
+            return attributes[Data_PM2_5];
+            break;
+            
+        case IoTDevicehumidity:
+            return attributes[Data_humidity];
+            break;
+            
+        case IoTDevice_model:
+            return attributes[Data_model];
+            break;
+            
+        case IoTDevice_temperature:
+            return attributes[Data_temperature];
+            break;
             
         default:
             NSLog(@"Error: read invalid datapoint, skip.");
@@ -539,32 +494,33 @@ static CGFloat const kContentMargin = 15.0;
     NSDictionary *_data = [data valueForKey:@"data"];
     if(nil != _data)
     {
-        NSString *onOff             = [self readDataPoint:IoTDeviceWriteOnOff data:_data];
-        NSString *switchPlasma      = [self readDataPoint:(IoTDeviceWriteSwitchPlasma) data:_data];
-        NSString *LEDairQuality     = [self readDataPoint:(IoTDeviceWriteLEDAirQuality) data:_data];
-        NSString *countDownOnMin    = [self readDataPoint:(IoTDeviceWriteCountDownOnMin) data:_data];
-        NSString *countDownOffMin   = [self readDataPoint:(IoTDeviceWriteCountDownOffMin) data:_data];
-        NSString *windVelocity      = [self readDataPoint:(IoTDeviceWriteWindVelocity) data:_data];
-        NSString *childSecurityLock = [self readDataPoint:IoTDeviceWriteChildSecurityLock data:_data];
-        NSString *airQuality        = [self readDataPoint:IoTDeviceWriteQuality data:_data];
-        NSString *airSensitivity    = [self readDataPoint:IoTDeviceWriteAirSensitivity data:_data];
-        NSString *filterLife        = [self readDataPoint:IoTDeviceWriteFilterLife data:_data];
+        bSwitch  = [[self readDataPoint:IoTDeviceWriteOnOff data:_data] boolValue];
+        NSString *AQI  = [self readDataPoint:IoTDeviceAlertAirQuality data:_data];
+        iFilter_Life = [[self readDataPoint:IoTDeviceAlertFilterLife data:_data] integerValue];
+        Air_Volume = [[self readDataPoint:IoTDeviceWriteWindVelocity  data:_data] integerValue];
+        _pm25Label.text = [self readDataPoint:IoTDeviceWritPM2_5 data:_data];
+         self.view.userInteractionEnabled = bSwitch;
         
-        bSwitch                     = [self prepareForUpdateFloat:onOff value:bSwitch];
-        iOnTiming                   = [self prepareForUpdateFloat:countDownOnMin value:iOnTiming];
-        iOffTiming                  = [self prepareForUpdateFloat:countDownOffMin value:iOffTiming];
-        bSwitch_Plasma              = [self prepareForUpdateFloat:switchPlasma value:bSwitch_Plasma];
-        bLED_Air_Quality            = [self prepareForUpdateFloat:LEDairQuality value:bLED_Air_Quality];
-        bChild_Security_Lock        = [self prepareForUpdateFloat:childSecurityLock value:bChild_Security_Lock];
-        iWindVelocity               = [self prepareForUpdateFloat:windVelocity value:iWindVelocity];
-        iAir_Quality                = [self prepareForUpdateFloat:airQuality value:iAir_Quality];
-        iAir_Sensitivity            = [self prepareForUpdateFloat:airSensitivity value:iAir_Sensitivity];
-        iFilter_Life                = [self prepareForUpdateFloat:filterLife value:iFilter_Life];
-        
-        //TODO::更新界面
-        NSArray *airQualityWords = @[@"优",@"良",@"中",@"差"];
-        _filterProgress.progress = iFilter_Life/100.0;
+        NSInteger maxAir = 254;
+        NSArray *airQualityWords = @[@"健康",@"亚健康",@"不健康"];
         NSString *qualityString = @"";
+        NSInteger iAir_Quality = AQI.integerValue;
+        if (iAir_Quality <= maxAir/airQualityWords.count)
+        {
+            qualityString = [airQualityWords firstObject];
+        }
+        else if(iAir_Quality <= maxAir/airQualityWords.count*2)
+        {
+            qualityString = airQualityWords[2];
+        }
+        else
+        {
+            qualityString = [airQualityWords lastObject];
+        }
+        //TODO::更新界面
+        
+        _filterProgress.progress = iFilter_Life/100.0;
+     
         if (iAir_Quality < airQualityWords.count-1)
         {
             qualityString = airQualityWords[iAir_Quality];
@@ -575,24 +531,9 @@ static CGFloat const kContentMargin = 15.0;
         [mAttrString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:0.694  green:0.039  blue:0.078 alpha:1] range:qualityRange];
         [mAttrString addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:15] range:qualityRange];
         _statusLabel.attributedText = mAttrString;
-        //end
+ 
         
-        self.airSensitivity         = iAir_Sensitivity;
-        self.filterLife             = iFilter_Life;
-        
-        /**
-         * 更新到 UI
-         */
-        [self selectSwitchPlasma:bSwitch_Plasma sendToDevice:NO];
-        [self selectChildSecurityLock:bChild_Security_Lock sendToDevice:NO];
-        [self selectLEDAirQuality:bLED_Air_Quality sendToDevice:NO];
-        [self selectWindVelocity:iWindVelocity sendToDevice:NO];
-        [self selectAirQuality:iAir_Quality];
-        
-        self.view.userInteractionEnabled = bSwitch;
-        
-        //更新关机时间
-        [self onUpdateShutdownText];
+ 
         
         //没有开机，切换页面
         if(!bSwitch)
@@ -608,46 +549,17 @@ static CGFloat const kContentMargin = 15.0;
      */
     if([self.navigationController.viewControllers lastObject] != self)
         return YES;
-    
-    self.alerts = [data valueForKey:@"alerts"];
-    self.faults = [data valueForKey:@"faults"];
-    
-    /**
+       /**
      * 清理旧报警及故障
      */
     [[IoTRecord sharedInstance] clearAllRecord];
     
-    if(self.alerts.count == 0 && self.faults.count == 0)
-    {
-        [self onUpdateAlarm];
-        return YES;
-    }
     
     /**
      * 添加当前故障
      */
     NSDate *date = [NSDate date];
-    if(self.alerts.count > 0)
-    {
-        for(NSDictionary *dict in self.alerts)
-        {
-            for(NSString *name in dict.allKeys)
-            {
-                [[IoTRecord sharedInstance] addRecord:date information:name];
-            }
-        }
-    }
     
-    if(self.faults.count > 0)
-    {
-        for(NSDictionary *dict in self.faults)
-        {
-            for(NSString *name in dict.allKeys)
-            {
-                [[IoTRecord sharedInstance] addRecord:date information:name];
-            }
-        }
-    }
     
     [self onUpdateAlarm];
     
@@ -722,21 +634,19 @@ static CGFloat const kContentMargin = 15.0;
     if([self.navigationController.viewControllers indexOfObject:self] > self.navigationController.viewControllers.count)
         self.device.delegate = nil;
     
-    //防止 delegate 出错，退出之前先关掉弹出框
-    [_alertView hide:YES];
-    [_timingSelection hide:YES];
-    [_shutdownStatusCtrl hide:YES];
+ 
 }
 
 #pragma mark - Properties
 - (NSInteger)onTiming
 {
-    return iOnTiming;
+    return 1;
+  //  return iOnTiming;
 }
 
 - (void)setOnTiming:(NSInteger)onTiming
 {
-    iOnTiming  = onTiming;
+   // iOnTiming  = onTiming;
 }
 
 - (void)setDevice:(XPGWifiDevice *)device
@@ -769,10 +679,6 @@ static CGFloat const kContentMargin = 15.0;
     }
     else
     {
-        //开机
-        self.shutdownStatusCtrl = [[IoTShutdownStatus alloc]init];
-        self.shutdownStatusCtrl.mainCtrl = self;
-        [self.shutdownStatusCtrl show:YES];
     }
 }
 
@@ -788,7 +694,7 @@ static CGFloat const kContentMargin = 15.0;
     {
         [IoTAppDelegate.hud hide:YES];
         [_alertView hide:YES];
-        [self.shutdownStatusCtrl hide:YES];
+       
         [[[IoTAlertView alloc] initWithMessage:@"连接已断开" delegate:nil titleOK:@"确定"] show:YES];
         
     }
@@ -849,40 +755,34 @@ static CGFloat const kContentMargin = 15.0;
 
 //跳入警报详细页面
 - (void)onAlarmList {
-    if(self.alerts.count == 0 && self.faults.count == 0)
-    {
-        NSLog(@"没有报警");
-    }else{
-        IoTAdvancedFeatures *faultList = [[IoTAdvancedFeatures alloc] init];
-        [self.navigationController pushViewController:faultList animated:YES];
-    }
-}
-
-//============风速===========
-- (IBAction)onStrong:(id)sender
-{
-    if(iWindVelocity != 0)
-        [self selectWindVelocity:0 sendToDevice:YES];
-    [self getFanTextColor:YES];
-}
-- (IBAction)onSleep:(id)sender
-{
-    if(iWindVelocity != 2)
-        [self selectWindVelocity:2 sendToDevice:YES];
     
 }
-- (IBAction)onStandard:(id)sender
-{
-    if(iWindVelocity != 1)
-        [self selectWindVelocity:1 sendToDevice:YES];
-    [self getFanTextColor:YES];
-}
+
+////============风速===========
+//- (IBAction)onStrong:(id)sender
+//{
+//    if(iWindVelocity != 0)
+//        [self selectWindVelocity:0 sendToDevice:YES];
+//    [self getFanTextColor:YES];
+//}
+//- (IBAction)onSleep:(id)sender
+//{
+//    if(iWindVelocity != 2)
+//        [self selectWindVelocity:2 sendToDevice:YES];
+//    
+//}
+//- (IBAction)onStandard:(id)sender
+//{
+//    if(iWindVelocity != 1)
+//        [self selectWindVelocity:1 sendToDevice:YES];
+//    [self getFanTextColor:YES];
+//}
 
 - (IBAction)onAuto:(id)sender
 {
-    if(iWindVelocity != 3)
-        [self selectWindVelocity:3 sendToDevice:YES];
-    [self getFanTextColor:YES];
+//    if(iWindVelocity != 3)
+//        [self selectWindVelocity:3 sendToDevice:YES];
+//    [self getFanTextColor:YES];
 }
 
 #pragma mark - Group Selection
@@ -893,144 +793,7 @@ static CGFloat const kContentMargin = 15.0;
     return [UIColor grayColor];
 }
 
-//设置风速
-- (void)selectWindVelocity:(NSInteger)index sendToDevice:(BOOL)send
-{
-    if(nil == self.btnSleep)
-        return;
-    
-    NSArray *btnItems = @[self.btnStrong, self.btnStandard, self.btnSleep, self.btnAuto];
-    
-    //风速：睡眠，标准，强力，自动，就只能选择其中的一种
-    if(index >= -1 && index <= 3)
-    {
-        iWindVelocity = index;
-        for(int i=0; i<(btnItems.count); i++)
-        {
-            BOOL bSelected = (index == i);
-            ((UIButton *)btnItems[i]).selected = bSelected;
-        }
-        
-        //发送数据
-        if(send && index != -1)
-            [self writeDataPoint:IoTDeviceWriteWindVelocity value:@(iWindVelocity)];
-    }
-}
 
-- (void)selectAirQuality:(NSInteger)index
-{
-    //空气质量状况：优，良，中，差其中一种
-    NSArray *imageString = @[@"good_word",@"liang_word",@"middle_word",@"bad_word"];
-    NSArray *imageString2 = @[@"good_bg",@"liang_bg",@"middle_bg",@"bad_bg"];
-    self.imageStatus.image = [UIImage imageNamed:imageString[index]];
-    self.imageStatusColor.image = [UIImage imageNamed:[imageString2 objectAtIndex:index]];
-    
-    if (index == 0)
-    {
-        self.Slider.value = 3;
-        [SlideNavigationController sharedInstance].navigationBar.barTintColor =  [UIColor colorWithRed:0.1484375 green:0.49609375 blue:0.90234375 alpha:1.00];//导航颜色
-    }
-    else if (index == 1)
-    {
-        self.Slider.value = 2;
-        [SlideNavigationController sharedInstance].navigationBar.barTintColor = [UIColor colorWithRed:0.29 green:0.79 blue:0.44 alpha:1];
-    }
-    else if (index == 2)
-    {
-        self.Slider.value = 1;
-        [SlideNavigationController sharedInstance].navigationBar.barTintColor = [UIColor colorWithRed:0.67 green:0.69 blue:0.10 alpha:1];
-    }
-    else if (index == 3)
-    {
-        self.Slider.value = 0;
-        [SlideNavigationController sharedInstance].navigationBar.barTintColor = [UIColor colorWithRed:0.85 green:0.58 blue:0.18 alpha:1];
-    }
-}
-
-//点击向上箭头按钮，设置动画使view上移65
-- (IBAction)sender:(id)sender
-{
-    CGRect frame = self.globalView.frame;
-    if(frame.origin.y == 0)
-        frame.origin.y = -65;
-    else
-        frame.origin.y = 0;
-    
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationsEnabled:YES];
-    self.globalView.frame = frame;
-    [UIView commitAnimations];
-}
-
-- (IBAction)btnSwitchPlasma:(UIButton *)sender
-{
-    [self selectSwitchPlasma:!bSwitch_Plasma sendToDevice:YES];
-}
-
-- (IBAction)btnChildSecurityLock:(UIButton *)sender
-{
-    [self selectChildSecurityLock:!bChild_Security_Lock sendToDevice:YES];
-}
-
-- (IBAction)btnLEDAirQuality:(UIButton *)sender
-{
-    [self selectLEDAirQuality:!bLED_Air_Quality sendToDevice:YES];
-}
-
-//设置等离子开关
-- (void)selectSwitchPlasma:(BOOL)bSelected sendToDevice:(BOOL)send
-{
-    bSwitch_Plasma = bSelected;
-    
-    //发送数据
-    if(send)
-        [self writeDataPoint:IoTDeviceWriteSwitchPlasma value:@(bSelected)];
-    
-    self.btnSwitchPlasma.selected = bSelected;
-    self.textSwitchPlasma.textColor = [self getFanTextColor:bSelected];
-    self.imageSwitchPlasma.image = self.btnSwitchPlasma.selected == YES ? [UIImage imageNamed:@"anion_select.png"] : [UIImage imageNamed:@"anion_not_select.png"];
-}
-
-//设置童锁
-- (void)selectChildSecurityLock:(BOOL)bSelected sendToDevice:(BOOL)send
-{
-    bChild_Security_Lock = bSelected;
-    
-    //发送数据
-    if(send)
-        [self writeDataPoint:IoTDeviceWriteChildSecurityLock value:@(bSelected)];
-    
-    self.btnChildSecurityLock.selected = bSelected;
-    self.textChildSecurityLock.textColor = [self getFanTextColor:bSelected];
-    self.imageChildSecurityLock.image = self.btnChildSecurityLock.selected == YES ? [UIImage imageNamed:@"lock_select.png"] : [UIImage imageNamed:@"lock_not_select.png"];
-}
-
-//设置LED空气质量指示灯
-- (void)selectLEDAirQuality:(BOOL)bSelected sendToDevice:(BOOL)send
-{
-    bLED_Air_Quality = bSelected;
-    
-    //发送数据
-    if(send)
-        [self writeDataPoint:IoTDeviceWriteLEDAirQuality value:@(bSelected)];
-    
-    self.btnLEDAirQuality.selected = bSelected;
-    self.textLEDAirQuality.textColor = [self getFanTextColor:bSelected];
-    self.imageLEDAirQuality.image = self.btnLEDAirQuality.selected == YES ? [UIImage imageNamed:@"quality_select.png"] : [UIImage imageNamed:@"quality_not_select.png"];
-}
-
-//定时关机
-- (IBAction)onTimeShut:(id)sender
-{
-    [_timingSelection hide:YES];
-    _timingSelection = [[IoTTimingSelection alloc] initWithTitle:@"倒计时关机" delegate:self currentValue:iOffTiming==0?24:(iOffTiming/60 -1)];
-    [_timingSelection show:YES];
-}
-
-- (void)onUpdateShutdownText
-{
-    self.textShutdown.text = iOffTiming == 0 ? @"倒计时关机" : [NSString stringWithFormat:@"%@小时后关", @(iOffTiming <= 60?1:iOffTiming/60)];
-}
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
@@ -1048,12 +811,12 @@ static CGFloat const kContentMargin = 15.0;
 
 - (void)IoTTimingSelectionDidConfirm:(IoTTimingSelection *)selection withValue:(NSInteger)value
 {
-    if(value == 24)
-        iOffTiming = 0;
-    else
-        iOffTiming = (value+1) * 60 ;
-    [self writeDataPoint:IoTDeviceWriteCountDownOffMin value:@(iOffTiming)];
-    [self onUpdateShutdownText];
+//    if(value == 24)
+//        iOffTiming = 0;
+//    else
+//        iOffTiming = (value+1) * 60 ;
+//    [self writeDataPoint:IoTDeviceWriteCountDownOffMin value:@(iOffTiming)];
+//    [self onUpdateShutdownText];
 }
 
 - (void)IoTAlertViewDidDismissButton:(IoTAlertView *)alertView withButton:(BOOL)isConfirm
@@ -1071,7 +834,7 @@ static CGFloat const kContentMargin = 15.0;
     //通过经纬度获取城市名
     [BJManegerHttpData requestCityByCLLoacation:newLocation complation:^(id obj) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.locationLabel.text = (NSString *)obj;
+           _location = (NSString *)obj;
             if ([obj length])
             {
                 NSString *string = [obj stringByAppendingString:@"的空气质量"];
@@ -1093,7 +856,7 @@ static CGFloat const kContentMargin = 15.0;
 }
 
 - (void)loadingEnvirenInfo{
-    [BJManegerHttpData requestAirQualifyInfo:self.locationLabel.text complation:^(id obj) {
+    [BJManegerHttpData requestAirQualifyInfo:_location complation:^(id obj) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSDictionary *resultDic = (NSDictionary *)obj;
             
@@ -1127,9 +890,9 @@ static CGFloat const kContentMargin = 15.0;
             //pm10
             double pm10 = [[resultDic valueForKey:@"pm10"] doubleValue];
             
-            self.airQualityLabel.text = airQualify;
-            self.pm25Label.text = [NSString stringWithFormat:@"%.0f",pm25];
-            self.pm10Label.text = [NSString stringWithFormat:@"%.0f",pm10];
+           
+            _pm25Label.text = [NSString stringWithFormat:@"%.0f",pm25];
+            _pm10Label.text = [NSString stringWithFormat:@"%.0f",pm10];
         });
     }];
 }
